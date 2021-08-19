@@ -5,6 +5,12 @@ https://www.conranshop.co.uk/outlet.html
 
 */
 
+extractNumberFromDiscountText = function(text) {
+    /*  text will be a string in the form "-50%"  */
+    substring = text.substr(1, text.indexOf("%")-1);
+    return parseInt(substring);
+}
+
 filter = function(threshold) {
     /*  threshold: only see items discounted by more than this (%)  */
 
@@ -39,10 +45,4 @@ filter = function(threshold) {
     console.log(
         "set threshold to " + threshold + "%, leaving " + counter.aboveThreshold + " items visible. " + counter.hidden +
         " items were hidden and " + counter.unhidden + " items were unhidden.");
-}
-
-extractNumberFromDiscountText = function(text) {
-    /*  text will be a string in the form "-50%"  */
-    substring = text.substr(1, text.indexOf("%")-1);
-    return parseInt(substring);
 }
