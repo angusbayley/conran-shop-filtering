@@ -5,16 +5,16 @@ https://www.conranshop.co.uk/outlet.html
 
 */
 
-extractNumberFromDiscountText = function(text) {
+const extractNumberFromDiscountText = (text) => {
     /*  text will be a string in the form "-50%"  */
     substring = text.substr(1, text.indexOf("%")-1);
     return parseInt(substring);
 }
 
-filter = function(threshold) {
+const filter = (threshold) => {
     /*  threshold: only see items discounted by more than this (%)  */
 
-    var counter = {
+    const counter = {
         hidden: 0,
         unhidden: 0,
         aboveThreshold: 0,
@@ -23,7 +23,7 @@ filter = function(threshold) {
 
     // TODO: extract DOM parsing rules for easier reading/updating...
 
-    var discountLabels = document.getElementsByClassName('discount-label');
+    const discountLabels = document.getElementsByClassName('discount-label');
     for (let label of discountLabels) {
         parent = label.parentElement.parentElement;
         if (extractNumberFromDiscountText(label.innerText) >= threshold) {
@@ -43,6 +43,7 @@ filter = function(threshold) {
     }
 
     console.log(
-        "set threshold to " + threshold + "%, leaving " + counter.aboveThreshold + " items visible. " + counter.hidden +
-        " items were hidden and " + counter.unhidden + " items were unhidden.");
+        `set threshold to ${threshold}%, leaving ${counter.aboveThreshold} items visible.\n` +
+        `${counter.hidden} items were hidden and ${counter.unhidden} items were unhidden.`
+    );
 }
