@@ -6,9 +6,33 @@ https://www.conranshop.co.uk/outlet.html
 */
 
 const extractNumberFromDiscountText = (text) => {
-    /*  text will be a string in the form "-50%"  */
-    substring = text.substr(1, text.indexOf("%")-1);
-    return parseInt(substring);
+    /*  text will be a string in any of the following forms:
+
+      - "-50%"
+      - "NOW -50%"
+
+    */
+    if (text) {
+        const discountPercentAsString = text.match(/(?!-)\d+(?=%)/);
+        return parseInt(discountPercentAsString);
+    } else {
+        return NaN;
+    }
+}
+
+const getProducts = () => {
+    const LABEL_CLASS = 'product-item';
+    return document.getElementsByClassName(LABEL_CLASS);
+}
+
+const getLabelElementForProduct = (product) => {
+    const LABEL_CLASS = 'value';
+    return product.getElementsByClassName(LABEL_CLASS)[0];
+}
+
+const getDiscountValue = (product) => {
+    const label = getLabelElementForProduct(product);
+    return label ? extractNumberFromDiscountText(label.innerText) : NaN;
 }
 
 const filter = (threshold) => {
@@ -17,33 +41,35 @@ const filter = (threshold) => {
     const counter = {
         hidden: 0,
         unhidden: 0,
+        noValue: 0,
         aboveThreshold: 0,
         belowThreshold: 0
     };
 
-    // TODO: extract DOM parsing rules for easier reading/updating...
-
-    const discountLabels = document.getElementsByClassName('discount-label');
-    for (let label of discountLabels) {
-        parent = label.parentElement.parentElement;
-        if (extractNumberFromDiscountText(label.innerText) >= threshold) {
+    const products = getProducts();
+    for (let product of products) {
+        const discountValue = getDiscountValue(product);
+        if (!discountValue) {
+            product.style.visibility = 'hidden';
+            counter.hidden += 1;
+        }
+        if (discountValue >= threshold) {
             counter.aboveThreshold += 1;
-            if (parent.hidden) {
-                parent.hidden = false;
+            if (product.hidden) {
+                product.style.visibility = 'visible';
                 counter.unhidden += 1;
             }
-        }
-        if (extractNumberFromDiscountText(label.innerText) < threshold) {
+        } else if (discountValue < threshold) {
             counter.belowThreshold += 1;
-            if (!parent.hidden) {
-                parent.hidden = true;
+            if (!product.hidden) {
+                product.style.visibility = 'hidden';
                 counter.hidden += 1;
             }
         }
     }
 
     console.log(
-        `set threshold to ${threshold}%, leaving ${counter.aboveThreshold} items visible.\n` +
+        `set threshold to ${threshold}%, leaving ${counter.aboveThreshold} items visible (from an initial ${products.length}).\n` +
         `${counter.hidden} items were hidden and ${counter.unhidden} items were unhidden.`
     );
 }
