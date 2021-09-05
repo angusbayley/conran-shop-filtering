@@ -2,7 +2,6 @@
 
 https://www.conranshop.co.uk/outlet.html
 
-
 */
 
 const extractNumberFromDiscountText = (text) => {
@@ -32,7 +31,7 @@ const getLabelElementForProduct = (product) => {
 
 const getDiscountValue = (product) => {
     const label = getLabelElementForProduct(product);
-    return label ? extractNumberFromDiscountText(label.innerText) : NaN;
+    return label ? extractNumberFromDiscountText(label.textContent) : NaN;
 }
 
 const filter = (threshold) => {
@@ -49,19 +48,21 @@ const filter = (threshold) => {
     const products = getProducts();
     for (let product of products) {
         const discountValue = getDiscountValue(product);
+        // use element.style.visibility as state instead of element.hidden
+        // conran shop CSS overrides default element.hidden display properties
         if (!discountValue) {
             product.style.visibility = 'hidden';
             counter.hidden += 1;
         }
         if (discountValue >= threshold) {
             counter.aboveThreshold += 1;
-            if (product.hidden) {
+            if (product.style.visibility === 'hidden') {
                 product.style.visibility = 'visible';
                 counter.unhidden += 1;
             }
         } else if (discountValue < threshold) {
             counter.belowThreshold += 1;
-            if (!product.hidden) {
+            if (product.style.visibility !== 'hidden') {
                 product.style.visibility = 'hidden';
                 counter.hidden += 1;
             }
