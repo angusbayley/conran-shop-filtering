@@ -34,8 +34,24 @@ const getDiscountValue = (product) => {
     return label ? extractNumberFromDiscountText(label.textContent) : NaN;
 }
 
+const isProductHidden = (product) => {
+    return product.style.visibility === 'hidden';
+}
+
+const hide = (product) => {
+    product.style.visibility = 'hidden';
+}
+
+const unhide = (product) => {
+    product.style.visibility = 'visible';
+}
+
 const filter = (threshold) => {
-    /*  threshold: only see items discounted by more than this (%)  */
+    /*  threshold: only see items discounted by more than this (%) 
+
+    does a fresh sweep of all product elements each time, flipping their style.visibility
+    as necessary. This allows the product list to be expanded between each call to filter()
+    */
 
     const counter = {
         hidden: 0,
@@ -49,21 +65,21 @@ const filter = (threshold) => {
     for (let product of products) {
         const discountValue = getDiscountValue(product);
         // use element.style.visibility as state instead of element.hidden
-        // conran shop CSS overrides default element.hidden display properties
+        // conran shop CSS overrides default element.hidden CSS rules
         if (!discountValue) {
             product.style.visibility = 'hidden';
             counter.hidden += 1;
         }
         if (discountValue >= threshold) {
             counter.aboveThreshold += 1;
-            if (product.style.visibility === 'hidden') {
-                product.style.visibility = 'visible';
+            if (isProductHidden(product)) {
+                unhide(product);
                 counter.unhidden += 1;
             }
         } else if (discountValue < threshold) {
             counter.belowThreshold += 1;
-            if (product.style.visibility !== 'hidden') {
-                product.style.visibility = 'hidden';
+            if (!isProductHidden(product)) {
+                hide(product);
                 counter.hidden += 1;
             }
         }
